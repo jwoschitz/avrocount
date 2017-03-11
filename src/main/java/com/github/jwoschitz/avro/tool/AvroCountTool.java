@@ -144,7 +144,9 @@ public class AvroCountTool implements Tool {
     }
 
     public static void main(String[] args) throws Exception {
-        boolean isVerbose = Arrays.stream(args).anyMatch(x -> x.equals(SHORT_OPT_VERBOSE) || x.equals(LONG_OPT_VERBOSE));
+        boolean isVerbose = Arrays.stream(args)
+                .map(x -> x.replace("-", ""))
+                .anyMatch(x -> x.equalsIgnoreCase(SHORT_OPT_VERBOSE) || x.equalsIgnoreCase(LONG_OPT_VERBOSE));
 
         // rewrite console logger to stderr and set log level based on verbosity
         // keep logger implementation details out of AvroCountTool
