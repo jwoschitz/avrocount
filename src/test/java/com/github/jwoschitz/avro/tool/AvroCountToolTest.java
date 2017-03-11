@@ -7,9 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 

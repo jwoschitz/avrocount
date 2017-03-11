@@ -19,7 +19,13 @@ shadowJar {
 }
 
 dependencies {
-    compile 'org.apache.avro:avro-tools:1.8.1'
+    compile 'ch.qos.logback:logback-classic:1.1.8'
+
+    compile ('org.apache.avro:avro-tools:1.8.1') {
+        exclude group: 'org.slf4j'
+        exclude group: 'org.apache.logging.log4j'
+        exclude group: 'log4j'
+    }
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.apache.avro:avro:1.8.1:tests'
