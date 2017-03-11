@@ -1,0 +1,34 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'java'
+    id 'maven'
+    id 'idea'
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'com.github.jwoschitz.avro.tool.AvroCountTool'
+    }
+    classifier = null
+}
+
+dependencies {
+    compile 'org.apache.avro:avro-tools:1.8.1'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.apache.avro:avro:1.8.1:tests'
+}
+
+jar.enabled = false
+
+artifacts {
+    shadowJar;
+}
+
+build.dependsOn(shadowJar);
