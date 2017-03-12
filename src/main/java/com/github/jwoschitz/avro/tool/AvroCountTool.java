@@ -143,24 +143,34 @@ public class AvroCountTool implements Tool {
         ps.println(getShortDescription());
     }
 
+    private static boolean redirectLogger(Logger logger, boolean isVerbose) {
+        if (logger instanceof ch.qos.logback.classic.Logger) {
+            try {
+                // rewrite console logger to stderr and set log level based on verbosity
+                // keep logger implementation details out of AvroCountTool
+                ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+                root.setLevel(isVerbose ? ch.qos.logback.classic.Level.DEBUG : ch.qos.logback.classic.Level.ERROR);
+
+                ch.qos.logback.core.Appender<ch.qos.logback.classic.spi.ILoggingEvent> appender = root.getAppender("console");
+                ((ch.qos.logback.core.ConsoleAppender) appender).setTarget(ch.qos.logback.core.joran.spi.ConsoleTarget.SystemErr.getName());
+                appender.start();
+
+                return true;
+            } catch (Exception e) {
+                LOGGER.warn("An unexpected error occurred while trying to redirect logger", e);
+            }
+        }
+        return false;
+    }
+
     public static void main(String[] args) throws Exception {
         boolean isVerbose = Arrays.stream(args)
                 .map(x -> x.replace("-", ""))
                 .anyMatch(x -> x.equalsIgnoreCase(SHORT_OPT_VERBOSE) || x.equalsIgnoreCase(LONG_OPT_VERBOSE));
 
-        try {
-            // rewrite console logger to stderr and set log level based on verbosity
-            // keep logger implementation details out of AvroCountTool
-            ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-            root.setLevel(isVerbose ? ch.qos.logback.classic.Level.DEBUG : ch.qos.logback.classic.Level.ERROR);
-
-            ch.qos.logback.core.Appender<ch.qos.logback.classic.spi.ILoggingEvent> appender = root.getAppender("console");
-            ((ch.qos.logback.core.ConsoleAppender) appender).setTarget(ch.qos.logback.core.joran.spi.ConsoleTarget.SystemErr.getName());
-            appender.start();
-        } catch (Exception e) {
-            if (isVerbose) {
-                LOGGER.warn("An error occurred while trying to obtain logger, potential classpath conflict", e);
-            }
+        boolean isRedirected = redirectLogger(LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME), isVerbose);
+        if (!isRedirected && isVerbose) {
+            LOGGER.warn("Unable to redirect logger, verbose output might potentially not work");
         }
 
         int rc = (new AvroCountTool()).run(System.in, System.out, System.err, asList(args));
