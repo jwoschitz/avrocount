@@ -4,6 +4,7 @@ import com.github.jwoschitz.avro.tool.utils.AvroDataFileGenerator;
 import com.github.jwoschitz.avro.tool.utils.FileTestUtil;
 import org.apache.avro.AvroTestUtil;
 import org.apache.avro.file.CodecFactory;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -172,5 +173,27 @@ public class AvroCountToolTest {
         } catch (IOException e) {
             assertTrue(e.getMessage().contains("Not a data file"));
         }
+    }
+
+    @Test
+    @Ignore
+    public void testBenchmark() throws Exception {
+        AvroDataFileGenerator generator = intRecordGenerator(getClass(), CodecFactory.snappyCodec());
+        File folder = AvroTestUtil.tempDirectory(getClass(), testName.getMethodName());
+
+        for (int i = 0; i < 100; i++) {
+            generator.createAvroFile(String.format("%s_%s.avro", testName.getMethodName(), i), 10000000, folder);
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        int returnCode = new AvroCountTool().run(
+                System.in,
+                new PrintStream(outputStream, true, StandardCharsets.UTF_8.toString()),
+                System.err,
+                Collections.singletonList(folder.getAbsolutePath())
+        );
+
+        assertEquals(0, returnCode);
+        assertEquals("1000000000", new String(outputStream.toByteArray(), StandardCharsets.UTF_8).trim());
     }
 }

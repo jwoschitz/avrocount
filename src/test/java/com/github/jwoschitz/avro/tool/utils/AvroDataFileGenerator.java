@@ -1,6 +1,5 @@
 package com.github.jwoschitz.avro.tool.utils;
 
-import org.apache.avro.AvroTestUtil;
 import org.apache.avro.Schema;
 import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
@@ -9,27 +8,26 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.GenericRecordBuilder;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.function.BiFunction;
 
 public class AvroDataFileGenerator {
     private final Schema schema;
     private final CodecFactory codecFactory;
-    private final BiFunction<Schema, Integer, GenericRecord> recordCreatorFn;
+    private final BiFunction<Schema, Long, GenericRecord> recordCreatorFn;
     private final Class testClass;
 
-    public AvroDataFileGenerator(Class testClass, Schema schema, BiFunction<Schema, Integer, GenericRecord> recordCreatorFn, CodecFactory codecFactory) {
+    public AvroDataFileGenerator(Class testClass, Schema schema, BiFunction<Schema, Long, GenericRecord> recordCreatorFn, CodecFactory codecFactory) {
         this.schema = schema;
         this.codecFactory = codecFactory;
         this.recordCreatorFn = recordCreatorFn;
         this.testClass = testClass;
     }
 
-    public File createAvroFile(String fileName, int recordCount) throws Exception {
+    public File createAvroFile(String fileName, long recordCount) throws Exception {
         return createAvroFile(fileName, recordCount, null);
     }
 
-    public File createAvroFile(String fileName, int recordCount, File parent) throws Exception {
+    public File createAvroFile(String fileName, long recordCount, File parent) throws Exception {
         final File target = FileTestUtil.file(testClass, fileName, parent);
 
         try (DataFileWriter<Object> writer = new DataFileWriter<>(new GenericDatumWriter<>(schema))) {
@@ -38,7 +36,7 @@ public class AvroDataFileGenerator {
             }
             writer.create(schema, target);
 
-            for (int i = 0; i < recordCount; i++) {
+            for (long i = 0; i < recordCount; i++) {
                 writer.append(recordCreatorFn.apply(schema, i));
             }
         }
