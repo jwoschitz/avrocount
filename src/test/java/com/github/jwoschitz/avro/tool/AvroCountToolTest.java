@@ -24,15 +24,44 @@ public class AvroCountToolTest {
 
     @Test
     public void testCountOneFileNoCodec() throws Exception {
-        File avroFile = intRecordGenerator(getClass(), CodecFactory.nullCodec())
+        testCountOneFileWithCodec(null);
+    }
+
+    @Test
+    public void testCountOneFileNullCodec() throws Exception {
+        testCountOneFileWithCodec(CodecFactory.nullCodec());
+    }
+
+    @Test
+    public void testCountOneFileSnappy() throws Exception {
+        testCountOneFileWithCodec(CodecFactory.snappyCodec());
+    }
+
+    @Test
+    public void testCountOneFileDeflate() throws Exception {
+        testCountOneFileWithCodec(CodecFactory.deflateCodec(CodecFactory.DEFAULT_DEFLATE_LEVEL));
+    }
+
+    @Test
+    public void testCountOneFileBzip2() throws Exception {
+        testCountOneFileWithCodec(CodecFactory.bzip2Codec());
+    }
+
+    @Test
+    public void testCountOneFileXz() throws Exception {
+        testCountOneFileWithCodec(CodecFactory.xzCodec(CodecFactory.DEFAULT_XZ_LEVEL));
+    }
+
+    private void testCountOneFileWithCodec(CodecFactory codec) throws Exception {
+        File avroFile = intRecordGenerator(getClass(), codec)
                 .createAvroFile(String.format("%s.avro", testName.getMethodName()), 1000);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            int returnCode = new AvroCountTool().run(
-            System.in,
-            new PrintStream(outputStream, true, StandardCharsets.UTF_8.toString()),
-            System.err,
-            Collections.singletonList(avroFile.getAbsolutePath())
+        int returnCode = new AvroCountTool().run(
+                System.in,
+                new PrintStream(outputStream, true, StandardCharsets.UTF_8.toString()),
+                System.err,
+                Collections.singletonList(avroFile.getAbsolutePath())
         );
 
         assertEquals(0, returnCode);
@@ -41,7 +70,36 @@ public class AvroCountToolTest {
 
     @Test
     public void testCountFilesInFolderNoCodec() throws Exception {
-        AvroDataFileGenerator generator = intRecordGenerator(getClass(), CodecFactory.nullCodec());
+        testCountFilesInFolderWithCodec(null);
+    }
+
+    @Test
+    public void testCountFilesInFolderNullCodec() throws Exception {
+        testCountFilesInFolderWithCodec(CodecFactory.nullCodec());
+    }
+
+    @Test
+    public void testCountFilesInFolderSnappy() throws Exception {
+        testCountFilesInFolderWithCodec(CodecFactory.snappyCodec());
+    }
+
+    @Test
+    public void testCountFilesInFolderDeflate() throws Exception {
+        testCountFilesInFolderWithCodec(CodecFactory.deflateCodec(CodecFactory.DEFAULT_DEFLATE_LEVEL));
+    }
+
+    @Test
+    public void testCountFilesInFolderBzip2() throws Exception {
+        testCountFilesInFolderWithCodec(CodecFactory.bzip2Codec());
+    }
+
+    @Test
+    public void testCountFilesInFolderXz() throws Exception {
+        testCountFilesInFolderWithCodec(CodecFactory.xzCodec(CodecFactory.DEFAULT_XZ_LEVEL));
+    }
+
+    private void testCountFilesInFolderWithCodec(CodecFactory codec) throws Exception {
+        AvroDataFileGenerator generator = intRecordGenerator(getClass(), codec);
         File folder = AvroTestUtil.tempDirectory(getClass(), testName.getMethodName());
 
         for (int i = 0; i < 10; i++) {
