@@ -9,6 +9,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.GenericRecordBuilder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.function.BiFunction;
 
 public class AvroDataFileGenerator {
@@ -29,11 +30,7 @@ public class AvroDataFileGenerator {
     }
 
     public File createAvroFile(String fileName, int recordCount, File parent) throws Exception {
-        final File target = parent != null ?
-                new File(parent, fileName) :
-                AvroTestUtil.tempFile(testClass, fileName);
-
-        target.deleteOnExit();
+        final File target = FileTestUtil.file(testClass, fileName, parent);
 
         try (DataFileWriter<Object> writer = new DataFileWriter<>(new GenericDatumWriter<>(schema))) {
             if (codecFactory != null) {
