@@ -1,5 +1,6 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'co.riiid.gradle' version '0.4.2'
     id 'java'
     id 'maven'
     id 'idea'
@@ -29,6 +30,19 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.apache.avro:avro:1.8.1:tests'
+}
+
+github {
+    owner = 'jwoschitz'
+    repo = 'avrocount'
+    token = project.hasProperty('githubToken') ? githubToken : '-'
+    tagName = project.version
+    targetCommitish = 'master'
+    name = project.version
+    body = 'Release v' + project.version
+    assets = [
+        shadowJar.getArchivePath()
+    ]
 }
 
 jar.enabled = false
