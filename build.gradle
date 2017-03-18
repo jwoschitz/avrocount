@@ -52,3 +52,5 @@ artifacts {
 }
 
 build.dependsOn(shadowJar);
+
+githubRelease.dependsOn(build);
