@@ -66,7 +66,7 @@ public class AvroCountTool implements Tool {
         for (FileStatus status : fs.listStatus(p, filePath -> {
             boolean hasAvroSuffix = filePath.toString().endsWith(".avro");
             if (!hasAvroSuffix) {
-                LOGGER.error("Ignoring file {}, does not have .avro suffix");
+                LOGGER.error("Ignoring file {}, does not have .avro suffix", filePath.toString());
             }
             return hasAvroSuffix;
         })) {
