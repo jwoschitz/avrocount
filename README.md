@@ -8,6 +8,10 @@ This tool provides a way of efficiently counting records in Apache Avro data fil
 
 It works with single files or whole folders, with local filesystem or HDFS.
 
+- [Usage](#usage)
+- [Build from source](#build%20from%20source)
+- [Motivation](#motivation)
+
 Usage
 ------------
 
@@ -65,3 +69,19 @@ gradle build
 ```
 
 This will generate an uber-jar (contains all relevant dependencies) in `./build/libs/`
+
+Motivation
+----------
+
+The initial idea was submitted as a patch in 2015 to the Apache Avro project (https://issues.apache.org/jira/browse/AVRO-1720) as an addition to the already existing avro-tools.
+
+Though due to several reasons this patch has not been merged yet.
+
+Unfortunately up to this date there is no convenient and efficient way to count records in an Avro data file by using avro-tools from the command line.
+
+This project tries to fill this gap (at least) until a similar functionality is provided by avro-tools.
+
+Over time there were also several improvements to this project in comparison to the original patch.
+
+It would be great if these improvements would also find a way back into the Apache Avro project in the longterm. Until then this project can be used in addition to the currently existing avro-tools.
+
