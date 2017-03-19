@@ -170,7 +170,7 @@ public class AvroCountToolTest {
                     Collections.singletonList(someFile.getAbsolutePath())
             );
             fail("Should raise an exception if a '.avro' suffixed non-avro file is given");
-        } catch (IOException e) {
+        } catch (Exception e) {
             assertTrue(e.getMessage().contains("Not a data file"));
         }
     }

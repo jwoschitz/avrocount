@@ -21,6 +21,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static java.util.Arrays.asList;
 
@@ -114,26 +117,49 @@ public class AvroCountTool implements Tool {
 
         List<BufferedAvroInputStream> inStreams = fileOrStdin(nargs.get(0).toString(), stdin);
 
-        long count = 0L;
-        for (BufferedAvroInputStream inStream : inStreams) {
-            GenericDatumReader<Object> reader = new GenericDatumReader<>();
+        long totalCount = 0L;
 
-            long startedProcessingAt = System.currentTimeMillis();
-            LOGGER.debug("Processing {}", inStream.getPath());
-            try (DataFileStream<Object> streamReader = new DataFileStream<>(inStream, reader)) {
-                count += streamReader.getBlockCount();
-                while (streamReader.hasNext()) {
-                    streamReader.nextBlock();
-                    count += streamReader.getBlockCount();
-                }
+        if (inStreams.size() > 0) {
+            ExecutorService executor = Executors.newFixedThreadPool(inStreams.size());
+            List<Future<Long>> processors = new LinkedList<>();
+
+            for (final BufferedAvroInputStream inStream : inStreams) {
+                Future<Long> processor = executor.submit(() -> {
+                    try {
+                        LOGGER.debug("Started to process {}", inStream.getPath());
+
+                        GenericDatumReader<Object> reader = new GenericDatumReader<>();
+
+                        long count = 0L;
+
+                        long startedProcessingAt = System.currentTimeMillis();
+                        try (DataFileStream<Object> streamReader = new DataFileStream<>(inStream, reader)) {
+                            count += streamReader.getBlockCount();
+                            while (streamReader.hasNext()) {
+                                streamReader.nextBlock();
+                                count += streamReader.getBlockCount();
+                            }
+                        }
+
+                        LOGGER.debug("Processed {} in {}ms", inStream.getPath(), System.currentTimeMillis() - startedProcessingAt);
+                        return count;
+                    } catch (Exception e) {
+                        LOGGER.error(String.format("Error occurred while processing %s", inStream.getPath()), e);
+                        throw e;
+                    }
+                });
+                processors.add(processor);
             }
-            LOGGER.debug("Processed {} in {}ms", inStream.getPath(), System.currentTimeMillis() - startedProcessingAt);
+
+            for (Future<Long> processor : processors) {
+                totalCount += processor.get();
+            }
         }
 
         LOGGER.debug("Finished in {}ms", System.currentTimeMillis() - startedAt);
 
         err.flush();
-        out.println(count);
+        out.println(totalCount);
         out.flush();
 
         return 0;
