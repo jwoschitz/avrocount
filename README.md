@@ -17,7 +17,9 @@ Usage
 
 ### Quickstart
 
-Simply invoke the tool via
+Get the [latest released version](https://github.com/jwoschitz/avrocount/releases/latest) or [build it from source](#build%20from%20source).
+
+Then simply invoke the tool via
 
 ```
 java -jar avrocount.jar /path/to/myfile.avro
@@ -57,7 +59,10 @@ jar -jar avrocount.jar hdfs://<namenode>/path/to/myfile.avro
 
 
 Build from source
-------------
+-----------------
+
+You can also get the already compiled dependencies from the
+[latest release](https://github.com/jwoschitz/avrocount/releases/latest).
 
 This project relies on gradle for dependency management and build automation.
 
