@@ -93,14 +93,21 @@ public class AvroCountTool implements Tool {
     public int run(InputStream stdin, PrintStream out, PrintStream err, List<String> args) throws Exception {
         OptionParser optionParser = new OptionParser() {{
             acceptsAll(asList(SHORT_OPT_VERBOSE, LONG_OPT_VERBOSE), "Enable verbose mode");
+            accepts("maxParallelism", "Maximum amount of parallelism")
+                    .withRequiredArg()
+                    .defaultsTo("-1")
+                    .ofType(Integer.class);
             nonOptions("Path to an avro file or directory containing avro files, a dash ('-') can be given as an input file to use stdin")
                     .describedAs("pathToAvroFile")
                     .isRequired();
         }};
 
         List nargs = Collections.emptyList();
+
+        int maxParallelism = -1;
         try {
             OptionSet optionSet = optionParser.parse(args.toArray(new String[0]));
+            maxParallelism = Integer.parseInt(optionSet.valueOf("maxParallelism").toString());
             nargs = optionSet.nonOptionArguments();
         } catch (OptionException e) {
             err.println(e.getMessage());
@@ -120,7 +127,8 @@ public class AvroCountTool implements Tool {
         long totalCount = 0L;
 
         if (inStreams.size() > 0) {
-            ExecutorService executor = Executors.newFixedThreadPool(inStreams.size());
+            int threadCount = maxParallelism > 0 ? Math.min(maxParallelism, inStreams.size()) : inStreams.size();
+            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             List<Future<Long>> processors = new LinkedList<>();
 
             for (final BufferedAvroInputStream inStream : inStreams) {

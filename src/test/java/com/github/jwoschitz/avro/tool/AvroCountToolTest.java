@@ -11,6 +11,7 @@ import org.junit.rules.TestName;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static com.github.jwoschitz.avro.tool.utils.AvroDataFileGenerator.intRecordGenerator;
@@ -191,6 +192,28 @@ public class AvroCountToolTest {
                 new PrintStream(outputStream, true, StandardCharsets.UTF_8.toString()),
                 System.err,
                 Collections.singletonList(folder.getAbsolutePath())
+        );
+
+        assertEquals(0, returnCode);
+        assertEquals("1000000000", new String(outputStream.toByteArray(), StandardCharsets.UTF_8).trim());
+    }
+
+    @Test
+    @Ignore
+    public void testBenchmarkWithMinimalParallelism() throws Exception {
+        AvroDataFileGenerator generator = intRecordGenerator(getClass(), CodecFactory.snappyCodec());
+        File folder = AvroTestUtil.tempDirectory(getClass(), testName.getMethodName());
+
+        for (int i = 0; i < 100; i++) {
+            generator.createAvroFile(String.format("%s_%s.avro", testName.getMethodName(), i), 10000000, folder);
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        int returnCode = new AvroCountTool().run(
+                System.in,
+                new PrintStream(outputStream, true, StandardCharsets.UTF_8.toString()),
+                System.err,
+                Arrays.asList(folder.getAbsolutePath(), "--maxParallelism=1")
         );
 
         assertEquals(0, returnCode);
