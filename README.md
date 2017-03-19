@@ -9,7 +9,7 @@ This tool provides a way of efficiently counting records in Apache Avro data fil
 It works with single files or whole folders, with local filesystem or HDFS.
 
 - [Usage](#usage)
-- [Build from source](#build%20from%20source)
+- [Build from source](#build-from-source)
 - [Motivation](#motivation)
 
 Usage
@@ -17,7 +17,7 @@ Usage
 
 ### Quickstart
 
-Get the [latest released version](https://github.com/jwoschitz/avrocount/releases/latest) or [build it from source](#build%20from%20source).
+Get the [latest released version](https://github.com/jwoschitz/avrocount/releases/latest) or [build it from source](#build-from-source).
 
 Then simply invoke the tool via
 
