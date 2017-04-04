@@ -1,10 +1,9 @@
 package com.github.jwoschitz.avro.tool;
 
+import com.github.jwoschitz.avro.file.CountableSkipDataFileStream;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.apache.avro.file.DataFileStream;
-import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.tool.Tool;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -136,14 +135,12 @@ public class AvroCountTool implements Tool {
                     try {
                         LOGGER.debug("Started to process {}", inStream.getPath());
 
-                        GenericDatumReader<Object> reader = new GenericDatumReader<>();
-
                         long count = 0L;
 
                         long startedProcessingAt = System.currentTimeMillis();
-                        try (DataFileStream<Object> streamReader = new DataFileStream<>(inStream, reader)) {
+                        try (CountableSkipDataFileStream streamReader = new CountableSkipDataFileStream(inStream)) {
                             count += streamReader.getBlockCount();
-                            while (streamReader.hasNext()) {
+                            while (streamReader.hasNextBlock()) {
                                 streamReader.nextBlock();
                                 count += streamReader.getBlockCount();
                             }

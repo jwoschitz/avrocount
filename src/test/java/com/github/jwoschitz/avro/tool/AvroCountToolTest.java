@@ -9,15 +9,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 
 import static com.github.jwoschitz.avro.tool.utils.AvroDataFileGenerator.intRecordGenerator;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class AvroCountToolTest {
 
@@ -218,5 +218,24 @@ public class AvroCountToolTest {
 
         assertEquals(0, returnCode);
         assertEquals("1000000000", new String(outputStream.toByteArray(), StandardCharsets.UTF_8).trim());
+    }
+
+    @Test
+    @Ignore
+    public void testBenchmarkBigFile() throws Exception {
+        AvroDataFileGenerator generator = intRecordGenerator(getClass(), CodecFactory.snappyCodec());
+        File folder = AvroTestUtil.tempDirectory(getClass(), testName.getMethodName());
+        generator.createAvroFile(String.format("%s_%s.avro", testName.getMethodName(), 0), 100000000, folder);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        int returnCode = new AvroCountTool().run(
+                System.in,
+                new PrintStream(outputStream, true, StandardCharsets.UTF_8.toString()),
+                System.err,
+                Collections.singletonList(folder.getAbsolutePath())
+        );
+
+        assertEquals(0, returnCode);
+        assertEquals("100000000", new String(outputStream.toByteArray(), StandardCharsets.UTF_8).trim());
     }
 }
