@@ -139,7 +139,6 @@ public class AvroCountTool implements Tool {
 
                         long startedProcessingAt = System.currentTimeMillis();
                         try (CountableSkipDataFileStream streamReader = new CountableSkipDataFileStream(inStream)) {
-                            count += streamReader.getBlockCount();
                             while (streamReader.hasNextBlock()) {
                                 streamReader.nextBlock();
                                 count += streamReader.getBlockCount();
