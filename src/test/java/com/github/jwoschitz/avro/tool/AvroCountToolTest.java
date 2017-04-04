@@ -26,37 +26,47 @@ public class AvroCountToolTest {
 
     @Test
     public void testCountOneFileNoCodec() throws Exception {
-        testCountOneFileWithCodec(null);
+        testCountOneFileWithCodec(null, 1000);
     }
 
     @Test
     public void testCountOneFileNullCodec() throws Exception {
-        testCountOneFileWithCodec(CodecFactory.nullCodec());
+        testCountOneFileWithCodec(CodecFactory.nullCodec(), 1000);
     }
 
     @Test
     public void testCountOneFileSnappy() throws Exception {
-        testCountOneFileWithCodec(CodecFactory.snappyCodec());
+        testCountOneFileWithCodec(CodecFactory.snappyCodec(), 1000);
     }
 
     @Test
     public void testCountOneFileDeflate() throws Exception {
-        testCountOneFileWithCodec(CodecFactory.deflateCodec(CodecFactory.DEFAULT_DEFLATE_LEVEL));
+        testCountOneFileWithCodec(CodecFactory.deflateCodec(CodecFactory.DEFAULT_DEFLATE_LEVEL), 1000);
     }
 
     @Test
     public void testCountOneFileBzip2() throws Exception {
-        testCountOneFileWithCodec(CodecFactory.bzip2Codec());
+        testCountOneFileWithCodec(CodecFactory.bzip2Codec(), 1000);
     }
 
     @Test
     public void testCountOneFileXz() throws Exception {
-        testCountOneFileWithCodec(CodecFactory.xzCodec(CodecFactory.DEFAULT_XZ_LEVEL));
+        testCountOneFileWithCodec(CodecFactory.xzCodec(CodecFactory.DEFAULT_XZ_LEVEL), 1000);
     }
 
-    private void testCountOneFileWithCodec(CodecFactory codec) throws Exception {
+    @Test
+    public void testCountSmallFileNullCodec() throws Exception {
+        testCountOneFileWithCodec(CodecFactory.nullCodec(), 1);
+    }
+
+    @Test
+    public void testCountSmallFileSnappyCodec() throws Exception {
+        testCountOneFileWithCodec(CodecFactory.snappyCodec(), 1);
+    }
+
+    private void testCountOneFileWithCodec(CodecFactory codec, long recordCount) throws Exception {
         File avroFile = intRecordGenerator(getClass(), codec)
-                .createAvroFile(String.format("%s.avro", testName.getMethodName()), 1000);
+                .createAvroFile(String.format("%s.avro", testName.getMethodName()), recordCount);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         int returnCode = new AvroCountTool().run(
@@ -67,7 +77,7 @@ public class AvroCountToolTest {
         );
 
         assertEquals(0, returnCode);
-        assertEquals("1000", new String(outputStream.toByteArray(), StandardCharsets.UTF_8).trim());
+        assertEquals(String.valueOf(recordCount), new String(outputStream.toByteArray(), StandardCharsets.UTF_8).trim());
     }
 
     @Test
