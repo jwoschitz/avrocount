@@ -28,6 +28,12 @@ dependencies {
         exclude group: 'log4j'
     }
 
+    compile ('net.java.dev.jets3t:jets3t:0.9.4') {
+        exclude group: 'org.slf4j'
+        exclude group: 'org.apache.logging.log4j'
+        exclude group: 'log4j'
+    }
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.apache.avro:avro:1.8.1:tests'
 }
