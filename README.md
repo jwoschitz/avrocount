@@ -15,7 +15,7 @@ It works with single files or whole folders, with local filesystem or HDFS.
 --------------
 
 
-| :exclamation:  This repository is partially deprecated   |
+| :warning: This repository is partially deprecated   |
 |-----------------------------------------|
 
 Since the release of Avro 1.10.0 (released on June 29, 2020), avro-tools provides an integrated way of counting Avro record files.
@@ -100,19 +100,19 @@ This will generate an uber-jar (contains all relevant dependencies) in `./build/
 
 ## Motivation
 
-The initial idea was submitted as a patch in 2015 to the Apache Avro project (https://issues.apache.org/jira/browse/AVRO-1720) as an addition to the already existing avro-tools.
+In 2015, an initial proposal was submitted as a patch to the Apache Avro project (https://issues.apache.org/jira/browse/AVRO-1720) to enhance the existing avro-tools.
 
-This project was created when the patch was not merged after being open for several years, as there was no convenient and efficient way to count records in an Avro data file by using avro-tools from the command line.
+The project emerged when the patch remained unmerged for an extended period, leaving no convenient or efficient method for counting records in Avro data files using avro-tools via the command line.
 
-This project attempted to fill this gap until a similar functionality was provided by avro-tools.
+This project sought to bridge that gap until avro-tools incorporated similar functionality.
 
-This happened as the original patch was merged in mid 2020. This renders the project partially obsolete, as it is possible to count records avro files now.
+The original patch was eventually merged in May 2020, rendering this project partially obsolete since counting records in Avro files became possible.
 
-Over time, there were several performance introduced to this project, which were not part of the original patch.
+However, several performance enhancements were introduced to this project, which were not included in the original patch.
 
-These performance improvements have not yet been ported back to avro-tools. If you are working with large avro files (> 1 GB or large number of records), then you might still gain a substantial performance improvement by using this project.
+These performance improvements have not yet been integrated into avro-tools. As a result, if you work with large Avro files (>1 GB or a significant number of records), you might still benefit from a considerable performance boost using this project.
 
-I'll be working on bringing the performance improvements back to the Apache Avro project, in the meantime you can still use this project as an alternative when dealing with large avro files.
+In the meantime, while working to incorporate the performance enhancements into the Apache Avro project, you can continue using this project as an alternative when handling large Avro files.
 
 ## Benchmark
 
