@@ -12,8 +12,30 @@ It works with single files or whole folders, with local filesystem or HDFS.
 - [Build from source](#build-from-source)
 - [Motivation](#motivation)
 
-Usage
-------------
+--------------
+
+
+| :exclamation:  This repository is partially deprecated   |
+|-----------------------------------------|
+
+Since the release of Avro 1.10.0 (released on June 29, 2020), avro-tools provides an integrated way of counting Avro record files.
+
+```
+java -jar avro-tools.jar count example.avro
+```
+
+The stable version of avro-tools can be downloaded from the [Apache Avro project page](https://avro.apache.org/project/download/).
+
+### Why still use this project?
+
+While avro-tools provides the general ability to count avro files nowadays, it is still lacking the performance improvements which have been implemented in this project.
+
+If you are working with large avro files (above 1 GB per file), using avrocount might provide a substantial performance gain.
+
+--------------
+
+
+## Usage
 
 ### Quickstart
 
@@ -58,8 +80,7 @@ jar -jar avrocount.jar hdfs://<namenode>/path/to/myfile.avro
 ```
 
 
-Build from source
------------------
+## Build from source
 
 You can also get the already compiled dependencies from the
 [latest release](https://github.com/jwoschitz/avrocount/releases/latest).
@@ -75,18 +96,42 @@ gradle build
 
 This will generate an uber-jar (contains all relevant dependencies) in `./build/libs/`
 
-Motivation
-----------
+## Motivation
 
 The initial idea was submitted as a patch in 2015 to the Apache Avro project (https://issues.apache.org/jira/browse/AVRO-1720) as an addition to the already existing avro-tools.
 
-Though due to several reasons this patch has not been merged yet.
+This project was created when the patch was not merged after being open for several years, as there was no convenient and efficient way to count records in an Avro data file by using avro-tools from the command line.
 
-Unfortunately up to this date there is no convenient and efficient way to count records in an Avro data file by using avro-tools from the command line.
+This project attempted to fill this gap until a similar functionality was provided by avro-tools.
 
-This project tries to fill this gap (at least) until a similar functionality is provided by avro-tools.
+This happened as the original patch was merged in mid 2020. This renders the project partially obsolete, as it is possible to count records avro files now.
 
-Over time there were also several improvements to this project in comparison to the original patch.
+Over time, there were several performance introduced to this project, which were not part of the original patch.
 
-It would be great if these improvements would also find a way back into the Apache Avro project in the longterm. Until then this project can be used in addition to the currently existing avro-tools.
+These performance improvements have not yet been ported back to avro-tools. If you are working with large avro files (> 1 GB or large number of records), then you might still gain a substantial performance improvement by using this project.
 
+I'll be working on bringing the performance improvements back to the Apache Avro project, in the meantime you can still use this project as an alternative when dealing with large avro files.
+
+## Benchmark
+
+This is a naive benchmark to show the difference in counting performance between `avro-tools count` and `avrocount`.
+
+The benchmark file was created via `avro-tools`. A file with 1000000000 records was created (approximates to a file size of ~4.2 GB).
+
+```
+java -jar avro-tools-1.11.1.jar random --count 1000000000 --schema-file src/test/resources/intRecord.avsc --seed 1 test_large.avro
+```
+
+Counting via `avro-tools-1.11.1.jar` takes about 32s wall time.
+```
+time java -jar avro-tools-1.11.1.jar count test_large.avro
+1000000000
+32.57s user 1.07s system 99% cpu 33.889 total
+```
+
+Counting via `avrocount-0.5.0-all.jar` takes only about 1s. This is about 30x faster than with the current implementation in Apache Avro.
+```
+time java -jar build/libs/avrocount-0.5.0-all.jar test_large.avro
+1000000000
+1.69s user 1.18s system 46% cpu 6.199 total
+```
