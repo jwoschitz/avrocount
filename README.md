@@ -32,6 +32,8 @@ While avro-tools provides the general ability to count avro files nowadays, it i
 
 If you are working with large avro files (above 1 GB per file), using avrocount might provide a substantial performance gain.
 
+See [Motivation](#motivation) and [Benchmark](#benchmark) for more information.
+
 --------------
 
 
