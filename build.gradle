@@ -1,54 +1,52 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
-    id 'co.riiid.gradle' version '0.4.2'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.github.breadmoirai.github-release' version '2.4.1'
     id 'java'
-    id 'maven'
     id 'idea'
 }
 
 sourceCompatibility = 1.8
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 shadowJar {
     manifest {
         attributes 'Main-Class': 'com.github.jwoschitz.avro.tool.AvroCountTool'
     }
-    classifier = null
 }
 
 dependencies {
-    compile 'ch.qos.logback:logback-classic:1.1.8'
+    implementation 'ch.qos.logback:logback-classic:1.4.6'
 
-    compile ('org.apache.avro:avro-tools:1.8.2') {
+    implementation ('org.apache.avro:avro-tools:1.11.1') {
         exclude group: 'org.slf4j'
         exclude group: 'org.apache.logging.log4j'
         exclude group: 'log4j'
     }
 
-    compile ('net.java.dev.jets3t:jets3t:0.9.4') {
+    implementation ('net.java.dev.jets3t:jets3t:0.9.4') {
         exclude group: 'org.slf4j'
         exclude group: 'org.apache.logging.log4j'
         exclude group: 'log4j'
     }
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.apache.avro:avro:1.8.1:tests'
+    testImplementation 'junit:junit:4.13.2'
 }
 
-github {
-    owner = 'jwoschitz'
-    repo = 'avrocount'
-    token = project.hasProperty('githubToken') ? githubToken : '-'
-    tagName = project.version
-    targetCommitish = 'master'
-    name = project.version
-    body = 'Release v' + project.version
-    assets = [
-        shadowJar.getArchivePath()
-    ]
+githubRelease {
+    token project.hasProperty('githubToken') ? githubToken : '-'
+    owner 'jwoschitz'
+    repo 'avrocount'
+    tagName project.version
+    targetCommitish 'master'
+    generateReleaseNotes false
+    body 'Release v' + project.version
+    releaseAssets shadowJar.archiveFile
+    allowUploadToExisting.set false
+    overwrite false
+    dryRun false
 }
 
 jar.enabled = false
@@ -58,5 +56,3 @@ artifacts {
 }
 
 build.dependsOn(shadowJar);
-
-githubRelease.dependsOn(build);

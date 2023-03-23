@@ -2,11 +2,11 @@ package com.github.jwoschitz.avro.tool;
 
 import com.github.jwoschitz.avro.tool.utils.AvroDataFileGenerator;
 import com.github.jwoschitz.avro.tool.utils.FileTestUtil;
-import org.apache.avro.AvroTestUtil;
 import org.apache.avro.file.CodecFactory;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestName;
 
 import java.io.ByteArrayOutputStream;
@@ -23,6 +23,9 @@ public class AvroCountToolTest {
 
     @Rule
     public TestName testName = new TestName();
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Test
     public void testCountOneFileNoCodec() throws Exception {
@@ -112,7 +115,7 @@ public class AvroCountToolTest {
 
     private void testCountFilesInFolderWithCodec(CodecFactory codec) throws Exception {
         AvroDataFileGenerator generator = intRecordGenerator(getClass(), codec);
-        File folder = AvroTestUtil.tempDirectory(getClass(), testName.getMethodName());
+        File folder = testFolder.newFolder(testName.getMethodName());
 
         for (int i = 0; i < 10; i++) {
             generator.createAvroFile(String.format("%s_%s.avro", testName.getMethodName(), i), 1000, folder);
@@ -149,7 +152,7 @@ public class AvroCountToolTest {
     @Test
     public void testIgnoreNonAvroSuffixedFilesInFolder() throws Exception {
         AvroDataFileGenerator generator = intRecordGenerator(getClass(), CodecFactory.nullCodec());
-        File folder = AvroTestUtil.tempDirectory(getClass(), testName.getMethodName());
+        File folder = testFolder.newFolder(testName.getMethodName());
 
         for (int i = 0; i < 10; i++) {
             FileTestUtil.createNewFile(getClass(), String.format("not_an_avro_%s.file", i), folder);
@@ -190,7 +193,7 @@ public class AvroCountToolTest {
     @Ignore
     public void testBenchmark() throws Exception {
         AvroDataFileGenerator generator = intRecordGenerator(getClass(), CodecFactory.snappyCodec());
-        File folder = AvroTestUtil.tempDirectory(getClass(), testName.getMethodName());
+        File folder = testFolder.newFolder(testName.getMethodName());
 
         for (int i = 0; i < 100; i++) {
             generator.createAvroFile(String.format("%s_%s.avro", testName.getMethodName(), i), 10000000, folder);
@@ -212,7 +215,7 @@ public class AvroCountToolTest {
     @Ignore
     public void testBenchmarkWithMinimalParallelism() throws Exception {
         AvroDataFileGenerator generator = intRecordGenerator(getClass(), CodecFactory.snappyCodec());
-        File folder = AvroTestUtil.tempDirectory(getClass(), testName.getMethodName());
+        File folder = testFolder.newFolder(testName.getMethodName());
 
         for (int i = 0; i < 100; i++) {
             generator.createAvroFile(String.format("%s_%s.avro", testName.getMethodName(), i), 10000000, folder);
@@ -234,7 +237,7 @@ public class AvroCountToolTest {
     @Ignore
     public void testBenchmarkBigFile() throws Exception {
         AvroDataFileGenerator generator = intRecordGenerator(getClass(), CodecFactory.snappyCodec());
-        File folder = AvroTestUtil.tempDirectory(getClass(), testName.getMethodName());
+        File folder = testFolder.newFolder(testName.getMethodName());
         generator.createAvroFile(String.format("%s_%s.avro", testName.getMethodName(), 0), 100000000, folder);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
